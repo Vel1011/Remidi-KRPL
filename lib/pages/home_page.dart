@@ -17,7 +17,6 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    // animasi banner
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() => _bannerVisible = true);
     });
@@ -27,40 +26,32 @@ class _HomePageState extends State<HomePage>
     setState(() => students.add(student));
   }
 
+  void _editStudent(int index, Student updated) {
+    setState(() => students[index] = updated);
+  }
+
+  void _deleteStudent(int index) {
+    setState(() => students.removeAt(index));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("PPDB Online",
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "PPDB Online",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         centerTitle: true,
-        actions: [
-          TextButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.home, color: Colors.white),
-            label: const Text("Home", style: TextStyle(color: Colors.white)),
-          ),
-          TextButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.info_outline, color: Colors.white),
-            label:
-                const Text("Informasi", style: TextStyle(color: Colors.white)),
-          ),
-          TextButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.phone, color: Colors.white),
-            label: const Text("Kontak", style: TextStyle(color: Colors.white)),
-          ),
-          TextButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.help_outline, color: Colors.white),
-            label: const Text("Tentang", style: TextStyle(color: Colors.white)),
-          ),
-        ],
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.indigo, Colors.blue],
+              colors: [Colors.indigo, Colors.blueAccent],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -68,10 +59,11 @@ class _HomePageState extends State<HomePage>
         ),
       ),
 
+      // ✅ Body
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFE3F2FD), Color(0xFFF1F8E9)],
+            colors: [Color(0xFFEAF2F8), Color(0xFFFDFEFE)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -79,7 +71,7 @@ class _HomePageState extends State<HomePage>
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Banner
+            // Banner Welcome
             AnimatedSlide(
               duration: const Duration(milliseconds: 800),
               offset: _bannerVisible ? Offset.zero : const Offset(0, -0.3),
@@ -90,24 +82,27 @@ class _HomePageState extends State<HomePage>
                 child: Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: const LinearGradient(
-                      colors: [Colors.lightBlueAccent, Colors.blueAccent],
+                    borderRadius: BorderRadius.circular(25),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.indigo.withOpacity(0.85),
+                        Colors.blueAccent.withOpacity(0.85),
+                      ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blue.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
+                        color: Colors.blue.withOpacity(0.25),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
                       )
                     ],
                   ),
                   child: Column(
                     children: const [
                       Icon(Icons.school, size: 70, color: Colors.white),
-                      SizedBox(height: 10),
+                      SizedBox(height: 12),
                       Text(
                         "Selamat Datang di PPDB Online",
                         style: TextStyle(
@@ -117,9 +112,9 @@ class _HomePageState extends State<HomePage>
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 5),
+                      SizedBox(height: 6),
                       Text(
-                        "Daftarkan diri Anda dengan mudah dan cepat",
+                        "Daftarkan diri Anda dengan mudah, cepat, dan praktis!",
                         style: TextStyle(fontSize: 14, color: Colors.white70),
                         textAlign: TextAlign.center,
                       ),
@@ -129,54 +124,48 @@ class _HomePageState extends State<HomePage>
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            // Informasi
-            TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 800),
-              tween: Tween(begin: -50, end: 0),
-              curve: Curves.easeOutBack,
-              builder: (context, value, child) {
-                return Transform.translate(
-                    offset: Offset(value, 0), child: child);
-              },
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.info, color: Colors.indigo, size: 40),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          "Silakan isi formulir pendaftaran dengan lengkap. Pastikan data sesuai dengan dokumen resmi.",
-                          style: TextStyle(fontSize: 14),
-                        ),
+            // Info
+            Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18)),
+              child: Padding(
+                padding: const EdgeInsets.all(18),
+                child: Row(
+                  children: const [
+                    Icon(Icons.info, color: Colors.indigo, size: 40),
+                    SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        "Silakan isi formulir pendaftaran dengan lengkap. Pastikan data sesuai dengan dokumen resmi.",
+                        style: TextStyle(fontSize: 14),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             const Text(
               "Data Pendaftar",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
 
-            // Daftar siswa
+            // ✅ List siswa dengan titik tiga per item
             students.isEmpty
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Text("Belum ada pendaftar.",
+                ? Column(
+                    children: const [
+                      SizedBox(height: 30),
+                      Icon(Icons.people_alt_outlined,
+                          size: 80, color: Colors.grey),
+                      SizedBox(height: 12),
+                      Text("Belum ada pendaftar.",
                           style: TextStyle(color: Colors.grey)),
-                    ),
+                    ],
                   )
                 : Column(
                     children: students.asMap().entries.map((entry) {
@@ -184,28 +173,71 @@ class _HomePageState extends State<HomePage>
                       final s = entry.value;
 
                       return TweenAnimationBuilder<double>(
-                        duration:
-                            Duration(milliseconds: 500 + (index * 200)),
+                        duration: Duration(milliseconds: 500 + (index * 200)),
                         tween: Tween(begin: 0, end: 1),
                         builder: (context, value, child) {
                           return Opacity(opacity: value, child: child);
                         },
                         child: Card(
-                          elevation: 3,
-                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
                           child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
                             leading: CircleAvatar(
                               backgroundColor: Colors.indigo,
-                              child: const Icon(Icons.person,
-                                  color: Colors.white),
-                            ),
-                            title: Text(s.namaLengkap,
+                              radius: 25,
+                              child: Text(
+                                s.namaLengkap.isNotEmpty
+                                    ? s.namaLengkap[0].toUpperCase()
+                                    : "?",
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold)),
+                                    fontSize: 18, color: Colors.white),
+                              ),
+                            ),
+                            title: Text(
+                              s.namaLengkap,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
                             subtitle: Text(
-                                "NISN: ${s.nisn}\nJK: ${s.jenisKelamin}"),
-                            trailing: const Icon(Icons.arrow_forward_ios,
-                                size: 16, color: Colors.grey),
+                              "NISN: ${s.nisn}\nJK: ${s.jenisKelamin}",
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                            trailing: PopupMenuButton<String>(
+                              icon: const Icon(Icons.more_vert),
+                              onSelected: (value) {
+                                if (value == "edit") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => FormPage(
+                                        onSubmit: (updated) =>
+                                            _editStudent(index, updated),
+                                        student: s, // kirim data lama ke form
+                                      ),
+                                    ),
+                                  );
+                                } else if (value == "delete") {
+                                  _deleteStudent(index);
+                                } else if (value == "cancel") {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text("Aksi dibatalkan")),
+                                  );
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                    value: "edit", child: Text("Edit")),
+                                const PopupMenuItem(
+                                    value: "delete", child: Text("Hapus")),
+                                const PopupMenuItem(
+                                    value: "cancel", child: Text("Batal")),
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -216,18 +248,36 @@ class _HomePageState extends State<HomePage>
       ),
 
       // Tombol daftar
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Colors.indigo,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => FormPage(onSubmit: _addStudent),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Colors.indigo, Colors.blueAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.indigo.withOpacity(0.4),
+              blurRadius: 10,
+              offset: const Offset(0, 6),
             ),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text("Daftar"),
+          ],
+        ),
+        child: FloatingActionButton.extended(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => FormPage(onSubmit: _addStudent),
+              ),
+            );
+          },
+          icon: const Icon(Icons.add, color: Colors.white),
+          label: const Text("Daftar", style: TextStyle(color: Colors.white)),
+        ),
       ),
     );
   }

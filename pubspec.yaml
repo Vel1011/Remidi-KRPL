@@ -31,6 +31,12 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Tambahan Supabase untuk koneksi ke database
+  supabase_flutter: ^2.8.0
+
+  # Tambahan Flutter Typeahead untuk autocomplete (versi lama agar cocok dengan kode)
+  flutter_typeahead: ^4.6.2
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8

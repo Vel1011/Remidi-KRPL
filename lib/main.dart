@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'services/supabase_service.dart';
 import 'pages/home_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inisialisasi Supabase
+  await Supabase.initialize(
+    url: SupabaseService.supabaseUrl, // ambil dari service
+    anonKey: SupabaseService.supabaseKey, // ambil dari service
+  );
+
   runApp(const MyApp());
 }
 
@@ -11,30 +21,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'PPDB (Sepertinya)',
       debugShowCheckedModeBanner: false,
-      title: 'PPDB Online',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
-      home: const HomeWrapper(),
-    );
-  }
-}
-
-/// Wrapper supaya tampilan HomePage lebih rapi di layar besar (web/desktop)
-class HomeWrapper extends StatelessWidget {
-  const HomeWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000),
-          child: const HomePage(), // halaman utama
-        ),
-      ),
+      home: const HomePage(), // halaman utama
     );
   }
 }
