@@ -34,6 +34,29 @@ class _HomePageState extends State<HomePage>
     setState(() => students.removeAt(index));
   }
 
+  // ✅ Fungsi baru: membuka FormPage dan menangkap hasil untuk auto-refresh
+  Future<void> _openFormPage({Student? student, int? index}) async {
+    final result = await Navigator.push<Student>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FormPage(
+          student: student,
+          onSubmit: (s) {
+            Navigator.pop(context, s);
+          },
+        ),
+      ),
+    );
+
+    if (result != null) {
+      if (student != null && index != null) {
+        _editStudent(index, result);
+      } else {
+        _addStudent(result);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -210,18 +233,90 @@ class _HomePageState extends State<HomePage>
                               icon: const Icon(Icons.more_vert),
                               onSelected: (value) {
                                 if (value == "edit") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => FormPage(
-                                        onSubmit: (updated) =>
-                                            _editStudent(index, updated),
-                                        student: s, // kirim data lama ke form
-                                      ),
-                                    ),
-                                  );
+                                  _openFormPage(student: s, index: index);
                                 } else if (value == "delete") {
-                                  _deleteStudent(index);
+                                  showModalBottomSheet(
+                                    context: context,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(20)),
+                                    ),
+                                    builder: (context) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(20),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.warning,
+                                                size: 50,
+                                                color:
+                                                    Colors.redAccent.shade200),
+                                            const SizedBox(height: 12),
+                                            Text(
+                                              "Hapus Data",
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.red.shade700),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              "Yakin ingin menghapus data '${s.namaLengkap}'?",
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            const SizedBox(height: 16),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                OutlinedButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  style:
+                                                      OutlinedButton.styleFrom(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                    ),
+                                                  ),
+                                                  child: const Text("Batal"),
+                                                ),
+                                                ElevatedButton.icon(
+                                                  icon: const Icon(Icons.delete),
+                                                  label: const Text("Hapus"),
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors.red,
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                    ),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                    _deleteStudent(index);
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                            "Data '${s.namaLengkap}' berhasil dihapus"),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
                                 } else if (value == "cancel") {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
@@ -229,13 +324,13 @@ class _HomePageState extends State<HomePage>
                                   );
                                 }
                               },
-                              itemBuilder: (context) => [
-                                const PopupMenuItem(
-                                    value: "edit", child: Text("Edit")),
-                                const PopupMenuItem(
-                                    value: "delete", child: Text("Hapus")),
-                                const PopupMenuItem(
-                                    value: "cancel", child: Text("Batal")),
+                              itemBuilder: (context) => const [
+                                PopupMenuItem(
+                                    value: "edit", child: Text("✏️ Edit")),
+                                PopupMenuItem(
+                                    value: "delete", child: Text("🗑️ Hapus")),
+                                PopupMenuItem(
+                                    value: "cancel", child: Text("❌ Batal")),
                               ],
                             ),
                           ),
@@ -267,14 +362,7 @@ class _HomePageState extends State<HomePage>
         child: FloatingActionButton.extended(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => FormPage(onSubmit: _addStudent),
-              ),
-            );
-          },
+          onPressed: () => _openFormPage(),
           icon: const Icon(Icons.add, color: Colors.white),
           label: const Text("Daftar", style: TextStyle(color: Colors.white)),
         ),

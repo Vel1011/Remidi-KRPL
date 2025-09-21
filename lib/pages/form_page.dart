@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/student.dart';
+import 'home_page.dart'; // pastikan ada import ini
 
 class FormPage extends StatefulWidget {
   final Function(Student) onSubmit;
-  final Student? student; // opsional, kalau null = tambah, kalau ada = edit
+  final Student? student;
 
   const FormPage({super.key, required this.onSubmit, this.student});
 
@@ -44,7 +45,6 @@ class _FormPageState extends State<FormPage> {
   @override
   void initState() {
     super.initState();
-    // Kalau ada student, isi form otomatis (mode edit)
     if (widget.student != null) {
       nisnCtrl.text = widget.student!.nisn;
       namaCtrl.text = widget.student!.namaLengkap;
@@ -69,7 +69,6 @@ class _FormPageState extends State<FormPage> {
     }
   }
 
-  // --- Supabase suggestions ---
   Future<List<Map<String, dynamic>>> _getDusunSuggestions(String pattern) async {
     try {
       final res = await supabase
@@ -123,6 +122,7 @@ class _FormPageState extends State<FormPage> {
         alamatOrtu: alamatOrtuCtrl.text,
       );
 
+      // Kirim data ke HomePage melalui callback
       widget.onSubmit(student);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -133,36 +133,12 @@ class _FormPageState extends State<FormPage> {
         ),
       );
 
-      if (widget.student == null) {
-        // hanya reset kalau tambah, jangan reset kalau edit
-        _formKey.currentState!.reset();
-        for (var ctrl in [
-          nisnCtrl,
-          namaCtrl,
-          tempatCtrl,
-          telpCtrl,
-          nikCtrl,
-          jalanCtrl,
-          rtrwCtrl,
-          dusunCtrl,
-          desaCtrl,
-          kecamatanCtrl,
-          kabupatenCtrl,
-          provinsiCtrl,
-          kodeposCtrl,
-          ayahCtrl,
-          ibuCtrl,
-          waliCtrl,
-          alamatOrtuCtrl,
-        ]) {
-          ctrl.clear();
-        }
-        setState(() {
-          jk = null;
-          agama = null;
-          tglLahir = null;
-        });
-      }
+      // Langsung kembali ke HomePage
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+        (route) => false,
+      );
     }
   }
 
@@ -240,6 +216,8 @@ class _FormPageState extends State<FormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // === Semua widget asli FormPage tetap utuh ===
+              // Data Pribadi
               _sectionTitle("Data Pribadi"),
               _buildCard([
                 TextFormField(
@@ -299,6 +277,7 @@ class _FormPageState extends State<FormPage> {
                 ),
               ]),
 
+              // === Tempat & Tanggal Lahir ===
               _sectionTitle("Tempat & Tanggal Lahir"),
               _buildCard([
                 Row(
@@ -345,6 +324,7 @@ class _FormPageState extends State<FormPage> {
                 ),
               ]),
 
+              // === Alamat ===
               _sectionTitle("Alamat"),
               _buildCard([
                 TextFormField(
@@ -426,6 +406,7 @@ class _FormPageState extends State<FormPage> {
                 ),
               ]),
 
+              // === Orang Tua / Wali ===
               _sectionTitle("Orang Tua / Wali"),
               _buildCard([
                 TextFormField(
@@ -469,7 +450,7 @@ class _FormPageState extends State<FormPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: _submit,
+                  onPressed: _submit, // <-- Callback simpan
                   icon: const Icon(Icons.save, color: Colors.white),
                   label: Text(
                     widget.student == null ? "Simpan" : "Update",
