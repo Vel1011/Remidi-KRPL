@@ -5,8 +5,9 @@ import '../models/student.dart';
 
 class FormPage extends StatefulWidget {
   final Function(Student) onSubmit;
+  final Student? student; // opsional, kalau null = tambah, kalau ada = edit
 
-  const FormPage({super.key, required this.onSubmit});
+  const FormPage({super.key, required this.onSubmit, this.student});
 
   @override
   State<FormPage> createState() => _FormPageState();
@@ -39,6 +40,34 @@ class _FormPageState extends State<FormPage> {
   final ibuCtrl = TextEditingController();
   final waliCtrl = TextEditingController();
   final alamatOrtuCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Kalau ada student, isi form otomatis (mode edit)
+    if (widget.student != null) {
+      nisnCtrl.text = widget.student!.nisn;
+      namaCtrl.text = widget.student!.namaLengkap;
+      jk = widget.student!.jenisKelamin;
+      agama = widget.student!.agama;
+      tempatCtrl.text = widget.student!.tempatLahir;
+      tglLahir = widget.student!.tanggalLahir;
+      telpCtrl.text = widget.student!.noTelp;
+      nikCtrl.text = widget.student!.nik;
+      jalanCtrl.text = widget.student!.jalan;
+      rtrwCtrl.text = widget.student!.rtrw;
+      dusunCtrl.text = widget.student!.dusun;
+      desaCtrl.text = widget.student!.desa;
+      kecamatanCtrl.text = widget.student!.kecamatan;
+      kabupatenCtrl.text = widget.student!.kabupaten;
+      provinsiCtrl.text = widget.student!.provinsi;
+      kodeposCtrl.text = widget.student!.kodePos;
+      ayahCtrl.text = widget.student!.namaAyah;
+      ibuCtrl.text = widget.student!.namaIbu;
+      waliCtrl.text = widget.student!.namaWali;
+      alamatOrtuCtrl.text = widget.student!.alamatOrtu;
+    }
+  }
 
   // --- Supabase suggestions ---
   Future<List<Map<String, dynamic>>> _getDusunSuggestions(String pattern) async {
@@ -97,36 +126,43 @@ class _FormPageState extends State<FormPage> {
       widget.onSubmit(student);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("✅ Data berhasil disimpan")),
+        SnackBar(
+          content: Text(widget.student == null
+              ? "✅ Data berhasil disimpan"
+              : "✏️ Data berhasil diperbarui"),
+        ),
       );
 
-      _formKey.currentState!.reset();
-      for (var ctrl in [
-        nisnCtrl,
-        namaCtrl,
-        tempatCtrl,
-        telpCtrl,
-        nikCtrl,
-        jalanCtrl,
-        rtrwCtrl,
-        dusunCtrl,
-        desaCtrl,
-        kecamatanCtrl,
-        kabupatenCtrl,
-        provinsiCtrl,
-        kodeposCtrl,
-        ayahCtrl,
-        ibuCtrl,
-        waliCtrl,
-        alamatOrtuCtrl,
-      ]) {
-        ctrl.clear();
+      if (widget.student == null) {
+        // hanya reset kalau tambah, jangan reset kalau edit
+        _formKey.currentState!.reset();
+        for (var ctrl in [
+          nisnCtrl,
+          namaCtrl,
+          tempatCtrl,
+          telpCtrl,
+          nikCtrl,
+          jalanCtrl,
+          rtrwCtrl,
+          dusunCtrl,
+          desaCtrl,
+          kecamatanCtrl,
+          kabupatenCtrl,
+          provinsiCtrl,
+          kodeposCtrl,
+          ayahCtrl,
+          ibuCtrl,
+          waliCtrl,
+          alamatOrtuCtrl,
+        ]) {
+          ctrl.clear();
+        }
+        setState(() {
+          jk = null;
+          agama = null;
+          tglLahir = null;
+        });
       }
-      setState(() {
-        jk = null;
-        agama = null;
-        tglLahir = null;
-      });
     }
   }
 
@@ -186,7 +222,7 @@ class _FormPageState extends State<FormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Formulir PPDB"),
+        title: Text(widget.student == null ? "Tambah Siswa" : "Edit Siswa"),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -284,7 +320,7 @@ class _FormPageState extends State<FormPage> {
                         onTap: () async {
                           final picked = await showDatePicker(
                             context: context,
-                            initialDate: DateTime(2010),
+                            initialDate: tglLahir ?? DateTime(2010),
                             firstDate: DateTime(1990),
                             lastDate: DateTime.now(),
                           );
@@ -435,9 +471,9 @@ class _FormPageState extends State<FormPage> {
                   ),
                   onPressed: _submit,
                   icon: const Icon(Icons.save, color: Colors.white),
-                  label: const Text(
-                    "Simpan",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  label: Text(
+                    widget.student == null ? "Simpan" : "Update",
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
               ),
